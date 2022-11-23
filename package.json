@@ -1,0 +1,25 @@
+{
+  "name": "book-management-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LalitKumarMalviya/Book-Management-Project.git"
+  },
+  "author": "Lalit kumar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LalitKumarMalviya/Book-Management-Project/issues"
+  },
+  "homepage": "https://github.com/LalitKumarMalviya/Book-Management-Project#readme",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2",
+    "mongoose": "^6.7.3",
+    "nodemon": "^2.0.20"
+  }
+}
