@@ -8,12 +8,6 @@ let isValid = function (value) {
     return true
 }
 
-//String Validation
-let isValidString = function (value) {
-    if (typeof value === 'string' && value.trim().length === 0) return false
-    return true
-}
-
 //Name Validation
 let isValidName = function (name) {
     let nameRegex = /^[a-zA-Z ]{2,30}$/
@@ -34,7 +28,7 @@ let isValidMobile = function (mobile) {
 //Email Validation
 let isValidEmail = function (email) {
     let emailRegex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/
-    
+
     return emailRegex.test(email)
 }
 
@@ -44,11 +38,6 @@ let isValidPassword = function (password) {
     return passRegex.test(password)
 }
 
-//ObjectId Validation
-let isValidObjectId = function (id) {
-    let ObjectId = mongoose.Types.ObjectId;
-    return ObjectId.isValid(id)
-}
 
 //ISBN Validation
 let isValidISBN = function (ISBN) {
@@ -64,18 +53,16 @@ let isValidDate = function (date) {
 
 //Rating Validation
 let isValidRating = function isInteger(value) {
-    return value % 1 == 0;
+    if (0 <= value <= 5) { return value % 1 == 0 };
 }
 
 module.exports = {
     isValidName,
-    isValidString,
     isValidTitle,
     isValidMobile,
     isValidISBN,
     isValidEmail,
     isValidPassword,
-    isValidObjectId,
     isValid,
     isValidDate,
     isValidRating

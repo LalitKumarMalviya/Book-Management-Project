@@ -2,6 +2,9 @@ const userModel = require("../model/userModel")
 const { isValidTitle, isValid, isValidName, isValidMobile, isValidEmail, isValidPassword } = require("../validation/validation")
 
 
+
+//------------------------------------{ create user }------------------------------------//
+
 const createUser = async function (req, res) {
 
     try {
@@ -77,9 +80,48 @@ const createUser = async function (req, res) {
         console.log({ error: err.message })
         return res.status(500).send({ status: false, error: err.message })
     }
+
 }
 
 
 
+//-----------------------------------{ login user }------------------------------------//
 
-module.exports = { createUser }
+const userLogin = async function (req, res) {
+
+    try {
+
+        let { email, password } = req.body
+
+        //------------------------Email validation--------------------//
+        if (!isValid(email)) {
+            return res.status(400).send({ status: false, message: 'Please provide email!' })
+        }
+        if (!isValidEmail(email)) {
+            return res.status(400).send({ status: false, message: 'Enter valid email!' })
+        }
+
+        //----------------------Password validation--------------------\\
+        if (!isValid(password)) {
+            return res.status(400).send({ status: false, message: 'Please provide password!' })
+        }
+        if (!isValidPassword(password)) {
+            return res.status(400).send({ status: false, message: 'Enter valid password!' })
+        }
+
+        //-------------------------Db Call----------------------------\\
+        let user = await userModel.findOne({ email: email, password: password })
+        res.status(200).send({ status: true, message: 'Success', data: user })
+
+    }
+    
+    catch (err) {
+        console.log({ error: err.message })
+        return res.status(500).send({ status: false, error: err.message })
+    }
+
+}
+
+
+
+module.exports = { createUser, userLogin }
