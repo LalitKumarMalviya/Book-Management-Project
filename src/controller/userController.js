@@ -1,5 +1,6 @@
 const userModel = require("../model/userModel")
 const { isValidTitle, isValid, isValidName, isValidMobile, isValidEmail, isValidPassword } = require("../validation/validation")
+const jwt = require('jsonwebtoken')
 
 
 
@@ -59,7 +60,6 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, message: 'Enter valid password!' })
         }
 
-
         //-------------------Phone Number Already Exist??----------------------\\
         let checkPhone = await userModel.findOne({ phone: phone })
         if (checkPhone) {
@@ -75,7 +75,9 @@ const createUser = async function (req, res) {
 
         let savedData = await userModel.create(data)
         res.status(201).send({ status: true, message: 'Success', data: savedData })
+
     }
+
     catch (err) {
         console.log({ error: err.message })
         return res.status(500).send({ status: false, error: err.message })
@@ -109,12 +111,28 @@ const userLogin = async function (req, res) {
             return res.status(400).send({ status: false, message: 'Enter valid password!' })
         }
 
-        //-------------------------Db Call----------------------------\\
+        //---------------------------Db Call------------------------------\\
         let user = await userModel.findOne({ email: email, password: password })
-        res.status(200).send({ status: true, message: 'Success', data: user })
+
+        if (!user) {
+            return res.status(404).send({ status: false, message: 'User Not Found!' })
+        }
+
+        //--------------------------jwt token----------------------------\\
+
+        let payload = {
+            userId: user._id.toString(),
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + 48 * 60 * 60
+        }
+
+        let token = jwt.sign(payload, 'project/bookManagement-Secret-key016&*%#3$%')
+
+        res.setHeader('x-auth-key', token)
+        res.status(201).send({ status: true, token })
 
     }
-    
+
     catch (err) {
         console.log({ error: err.message })
         return res.status(500).send({ status: false, error: err.message })

@@ -53,8 +53,29 @@ let isValidDate = function (date) {
 
 //Rating Validation
 let isValidRating = function isInteger(value) {
-    if (0 <= value <= 5) { return value % 1 == 0 };
+    return value % 1 == 0;
 }
+
+//address validation
+
+//street 
+let isValidStreet = function (value) {
+    let re = /^[a-zA-Z]{15,100}$/
+    return re.test(value)
+}
+
+//city
+let isValidCity = function (value) {
+    let re = /^[a-zA-Z]{3,20}$/
+    return re.test(value)
+}
+
+//pincode
+let isValidPincode = function (value) {
+    let re = /^[0-9]{6}$/
+    return re.test(value)
+}
+
 
 module.exports = {
     isValidName,
@@ -65,5 +86,8 @@ module.exports = {
     isValidPassword,
     isValid,
     isValidDate,
-    isValidRating
+    isValidRating,
+    isValidStreet,
+    isValidCity,
+    isValidPincode
 }

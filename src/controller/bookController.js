@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose")
 const bookModel = require("../model/bookModel")
 const reviewModel = require("../model/reviewModel")
 const userModel = require("../model/userModel")
-const { isValid, isValidISBN, isValidDate } = require("../validation/validation")
+const { isValid, isValidISBN, isValidDate, isValidStreet, isValidCity, isValidPincode } = require("../validation/validation")
 const moment = require('moment')
 
 
@@ -14,7 +14,7 @@ const createBooks = async function (req, res) {
     try {
 
         let data = req.body
-        let { title, excerpt, userId, ISBN, category, subcategory } = data
+        let { title, excerpt, userId, ISBN, category, subcategory, address } = data
 
         if (Object.keys(data).length === 0) {
             return res.status(400).send({ status: false, message: 'Please Enter Books data!' })
@@ -26,13 +26,13 @@ const createBooks = async function (req, res) {
             return res.status(400).send({ status: false, message: 'Please provide title!' })
         }
 
-        //-------------- Book excerpt validation --------------\\
+        //-------------- Book excerpt validation -------------\\
 
         if (!isValid(excerpt)) {
             return res.status(400).send({ status: false, message: 'Please provide excerpt!' })
         }
 
-        //---------------- user _id validation -----------------\\
+        //---------------- user _id validation ----------------\\
 
         if (!isValid(userId)) {
             return res.status(400).send({ status: false, message: 'Please provide useId!' })
@@ -64,6 +64,26 @@ const createBooks = async function (req, res) {
             return res.status(400).send({ status: false, message: 'Please provide subcategory!' })
         }
 
+        //-------------------- address validation-----------------------\\
+
+        if (Object.keys(address).length === 0) {
+            return res.status(400).send({ status: false, message: 'Please provide address!' })
+        }
+
+        //Street Validator
+        if (!isValidStreet(address.street)) {
+            return res.status(400).send({ status: false, message: 'Please provide Street!' })
+        }
+
+        //City Validator
+        if (!isValidCity(address.city)) {
+            return res.status(400).send({ status: false, message: 'Please provide valid City!' })
+        }
+
+        //Pincode Validator
+        if (!isValidPincode(address.pincode)) {
+            return res.status(400).send({ status: false, message: 'Please provide valid Pincode!' })
+        }
 
         let savedData = await bookModel.create(data)
         res.status(201).send({ status: true, message: 'Success', data: savedData })
@@ -104,22 +124,25 @@ const getAllBooks = async function (req, res) {
             return res.status(400).send({ status: false, message: 'User Id is invalid!!' })
         }
 
-        //---------------------Db call-----------------------------\\
+        //-----------------------Db call--------------------------\\
 
         let checkuser = await userModel.findOne({ _id: userId, isDeleted: false })
         if (!checkuser) {
             return res.status(404).send({ status: false, message: 'User is not Exist!' })
         }
 
-        //----------------category & subcategory validation-----------\\
+        //----------------------category validation------------------\\
 
-        if (category) {
-            if (category === "") {
+        if (category || category === "") {
+            if (!isValid(category)) {
                 return res.status(400).send({ status: false, message: 'category is Empty!' })
             }
         }
-        if (subcategory) {
-            if (subcategory === "") {
+
+        //---------------------subcategory validation-------------------\\
+
+        if (subcategory || subcategory === "") {
+            if (!isValid(subcategory)) {
                 return res.status(400).send({ status: false, message: 'subcategory is Empty!' })
             }
         }
@@ -168,7 +191,8 @@ const getBook = async function (req, res) {
             return res.status(404).send({ status: false, message: 'Book Not Found!' })
         }
 
-        let reviewsData = await reviewModel.find({ bookId: bookId })
+
+        let reviewsData = await reviewModel.find({ bookId: bookId, isDeleted: false })
         let numberOfData = reviewsData.length
 
         let setData = findBookData.toObject()
@@ -203,7 +227,7 @@ const updateBook = async function (req, res) {
         //----------------Book Id validation-----------------\\
 
         if (!isValid(bookId)) {
-            return res.status(400).send({ status: false, message: 'Book Id is must to fetch the data!' })
+            return res.status(400).send({ status: false, message: 'Book Id is must to Update Book!' })
         }
         bookId = bookId.trim()
         if (!mongoose.isValidObjectId(bookId)) {
@@ -217,46 +241,31 @@ const updateBook = async function (req, res) {
 
         //-----------------title validation------------------//
 
-        if (title) {
-            if (title === "") {
-                return res.status(400).send({ status: false, message: 'Book title is Empty!' })
-            }
-            title = title.trim()
+        if (title || title === "") {
             if (!isValid(title)) {
-                return res.status(400).send({ status: false, message: 'Book title is invalid!' })
+                return res.status(400).send({ status: false, message: 'Book title is Empty!' })
             }
         }
 
-        //-----------------excerpt validation------------------//
+        //-----------------excerpt validation-----------------//
 
-        if (excerpt) {
-            if (excerpt === "") {
-                return res.status(400).send({ status: false, message: 'excerpt is Empty!' })
-            }
-            excerpt = excerpt.trim()
+        if (excerpt || excerpt === "") {
             if (!isValid(excerpt)) {
-                return res.status(400).send({ status: false, message: 'Book excerpt is invalid!' })
+                return res.status(400).send({ status: false, message: 'Book excerpt is Empty!' })
             }
         }
 
         //-------------------ISBN validation------------------//
 
-        if (ISBN) {
-            if (ISBN === "") {
+        if (ISBN || ISBN === "") {
+            if (!isValidISBN(ISBN)) {
                 return res.status(400).send({ status: false, message: 'ISBN is Empty!' })
             }
-            ISBN = ISBN.trim()
-            if (!isValidISBN(ISBN)) {
-                return res.status(400).send({ status: false, message: 'ISBN is Not valid!' })
-            }
         }
+
         //-----------------releaseAt validation-----------------//
 
-        if (releasedAt) {
-            if (releasedAt === "") {
-                return res.status(400).send({ status: false, message: 'releasedAt is Empty!' })
-            }
-            releasedAt = releasedAt.trim()
+        if (releasedAt || releasedAt === "") {
             if (!isValidDate(releasedAt)) {
                 return res.status(400).send({ status: false, message: 'releasedAt Date is Not valid!' })
             }
@@ -295,6 +304,7 @@ const updateBook = async function (req, res) {
 const deleteBook = async function (req, res) {
 
     try {
+
         let bookId = req.params.bookId
 
         //----------------Book Id validation-----------------\\
@@ -313,11 +323,13 @@ const deleteBook = async function (req, res) {
             return res.status(404).send({ status: false, message: 'Book Not Found!' })
         }
 
-        let deletedBook = await bookModel.findByIdAndUpdate(
-            { _id: bookId },
-            { isDeleted: true, deletedAt: moment().format() },
-            { new: true }
-        )
+        let deletedBook = await bookModel.findByIdAndUpdate
+
+            (
+                { _id: bookId },
+                { isDeleted: true, deletedAt: moment().format() },
+                { new: true }
+            )
 
         res.status(200).send({ status: true, message: 'Successfully Deleted!' })
 

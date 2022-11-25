@@ -47,7 +47,6 @@ const bookSchema = new mongoose.Schema({
     reviews: {
         type: Number,
         default: 0,
-        comment: (String, 'Holds number of reviews of this book'),
         trim: true
     },
 
