@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { isValid } = require('../validation/validation')
 const mongoose = require('mongoose')
+const bookModel = require('../model/bookModel')
 
 //--------------------------------{ Authantication }-------------------------------------\\
 
@@ -50,6 +51,7 @@ const Authorization = async function (req, res, next) {
             if (!isValid(req.body.userId)) {
                 return res.status(400).send({ status: false, message: 'User Id is must to fetch the data!' })
             }
+            req.body.userId = req.body.userId.trim()
             if (!mongoose.isValidObjectId(req.body.userId)) {
                 return res.status(400).send({ status: false, message: 'User Id is invalid!!' })
             }
@@ -68,14 +70,37 @@ const Authorization = async function (req, res, next) {
             if (!isValid(req.query.userId)) {
                 return res.status(400).send({ status: false, message: 'User Id is must to fetch the data!' })
             }
+            req.query.userId = req.query.userId.trim()
             if (!mongoose.isValidObjectId(req.query.userId)) {
                 return res.status(400).send({ status: false, message: 'User Id is invalid!!' })
             }
 
-            if (req.body.userId != loggedInUserId) {
+            if (req.query.userId != loggedInUserId) {
                 return res.status(403).send({ status: false, message: 'LoggedIn User Is Not Allowed to get Other\'s user Data' })
             }
-            if (req.query.userId != loggedInUserId) {
+
+        }
+
+        //-----------------------Db Call for UserId Check----------------------\\
+
+        if (req.params.bookId) {
+
+            //----------------Book Id validation-----------------\\
+
+            if (!isValid(req.params.bookId)) {
+                return res.status(400).send({ status: false, message: 'Book Id is must to get Book!' })
+            }
+            req.params.bookId = req.params.bookId.trim()
+            if (!mongoose.isValidObjectId(req.params.bookId)) {
+                return res.status(400).send({ status: false, message: 'Book Id is invalid!!' })
+            }
+
+            let checkUser = await bookModel.findOne({ _id: req.params.bookId, isDeleted: false })
+            if (!checkUser) {
+                return res.status(404).send({ status: false, message: 'Book Not Found!' })
+            }
+
+            if (checkUser.userId != loggedInUserId) {
                 return res.status(403).send({ status: false, message: 'LoggedIn User Is Not Allowed to get Other\'s user Data' })
             }
 
@@ -89,7 +114,7 @@ const Authorization = async function (req, res, next) {
     }
 
     next()
-    
+
 }
 
 

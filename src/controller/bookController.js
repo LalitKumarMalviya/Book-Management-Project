@@ -32,16 +32,6 @@ const createBooks = async function (req, res) {
             return res.status(400).send({ status: false, message: 'Please provide excerpt!' })
         }
 
-        //---------------- user _id validation ----------------\\
-
-        if (!isValid(userId)) {
-            return res.status(400).send({ status: false, message: 'Please provide useId!' })
-        }
-        userId = userId.trim()
-        if (!mongoose.isValidObjectId(userId)) {
-            return res.status(400).send({ status: false, message: 'Enter valid userId!' })
-        }
-
         //------------------- ISBN validation ------------------\\
 
         if (!isValid(ISBN)) {
@@ -66,7 +56,7 @@ const createBooks = async function (req, res) {
 
         //-------------------- address validation-----------------------\\
 
-        if (Object.keys(address).length === 0) {
+        if (Object.keys(data.address).length === 0) {
             return res.status(400).send({ status: false, message: 'Please provide address!' })
         }
 
@@ -113,15 +103,6 @@ const getAllBooks = async function (req, res) {
             ...data,
             userId: userId,
             isDeleted: false
-        }
-
-        //----------------user Id validation--------------------\\
-
-        if (!isValid(userId)) {
-            return res.status(400).send({ status: false, message: 'User Id is must to fetch the data!' })
-        }
-        if (!mongoose.isValidObjectId(userId)) {
-            return res.status(400).send({ status: false, message: 'User Id is invalid!!' })
         }
 
         //-----------------------Db call--------------------------\\
@@ -177,20 +158,11 @@ const getBook = async function (req, res) {
 
         let { bookId } = req.params
 
-        //----------------Book Id validation--------------------\\
-
-        if (!isValid(bookId)) {
-            return res.status(400).send({ status: false, message: 'Book Id is must to fetch the data!' })
-        }
-        if (!mongoose.isValidObjectId(bookId)) {
-            return res.status(400).send({ status: false, message: 'Book Id is invalid!!' })
-        }
-
+        //----------------Db Call--------------//
         let findBookData = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (!findBookData) {
             return res.status(404).send({ status: false, message: 'Book Not Found!' })
         }
-
 
         let reviewsData = await reviewModel.find({ bookId: bookId, isDeleted: false })
         let numberOfData = reviewsData.length
@@ -222,21 +194,6 @@ const updateBook = async function (req, res) {
 
         if (Object.keys(data).length === 0) {
             return res.status(400).send({ status: false, message: 'Please Enter data to Update Book!' })
-        }
-
-        //----------------Book Id validation-----------------\\
-
-        if (!isValid(bookId)) {
-            return res.status(400).send({ status: false, message: 'Book Id is must to Update Book!' })
-        }
-        bookId = bookId.trim()
-        if (!mongoose.isValidObjectId(bookId)) {
-            return res.status(400).send({ status: false, message: 'Book Id is invalid!!' })
-        }
-
-        let findDataBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
-        if (!findDataBook) {
-            return res.status(404).send({ status: false, message: 'Book Not Found!' })
         }
 
         //-----------------title validation------------------//
@@ -275,7 +232,7 @@ const updateBook = async function (req, res) {
         let updatedBook = await bookModel.findOneAndUpdate
 
             (
-                { _id: bookId },
+                { _id: bookId, isDeleted: false },
                 {
                     $set: {
                         title: title,
@@ -307,26 +264,10 @@ const deleteBook = async function (req, res) {
 
         let bookId = req.params.bookId
 
-        //----------------Book Id validation-----------------\\
-
-        if (!isValid(bookId)) {
-            return res.status(400).send({ status: false, message: 'Book Id is must to fetch the data!' })
-        }
-        if (!mongoose.isValidObjectId(bookId)) {
-            return res.status(400).send({ status: false, message: 'Book Id is invalid!!' })
-        }
-
-        //----------------------Db Call------------------------\\
-
-        let findDataBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
-        if (!findDataBook) {
-            return res.status(404).send({ status: false, message: 'Book Not Found!' })
-        }
-
-        let deletedBook = await bookModel.findByIdAndUpdate
+        let deletedBook = await bookModel.findOneAndUpdate
 
             (
-                { _id: bookId },
+                { _id: bookId, isDeleted: false },
                 { isDeleted: true, deletedAt: moment().format() },
                 { new: true }
             )
