@@ -7,7 +7,7 @@ const moment = require('moment')
 
 
 
-//---------------------------------{ create Book }----------------------------------\\
+//-----------------------------------{ create Book }-------------------------------------\\
 
 const createBooks = async function (req, res) {
 
@@ -90,7 +90,7 @@ const createBooks = async function (req, res) {
 
 
 
-//----------------------------------{ get Books By Query }----------------------------------\\
+//----------------------------------{ get Books By Query }------------------------------------\\
 
 const getAllBooks = async function (req, res) {
 
@@ -150,7 +150,7 @@ const getAllBooks = async function (req, res) {
 }
 
 
-//----------------------------------{ get Books By Param }---------------------------------\\
+//----------------------------------{ get Books By Param }------------------------------------\\
 
 const getBook = async function (req, res) {
 
@@ -182,7 +182,7 @@ const getBook = async function (req, res) {
 }
 
 
-//------------------------------------{ Update Books }------------------------------------\\
+//------------------------------------{ Update Books }--------------------------------------\\
 
 const updateBook = async function (req, res) {
 
@@ -256,7 +256,7 @@ const updateBook = async function (req, res) {
 
 }
 
-//----------------------------------{ Delete Books }---------------------------------\\
+//-----------------------------------{ Delete Books }-------------------------------------\\
 
 const deleteBook = async function (req, res) {
 

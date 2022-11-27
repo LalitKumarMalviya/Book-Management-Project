@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 
 
 
-//------------------------------------{ create user }------------------------------------//
+//-------------------------------------{ create user }--------------------------------------//
 
 const createUser = async function (req, res) {
 
@@ -87,7 +87,7 @@ const createUser = async function (req, res) {
 
 
 
-//-----------------------------------{ login user }------------------------------------//
+//-------------------------------------{ login user }-----------------------------------------//
 
 const userLogin = async function (req, res) {
 
