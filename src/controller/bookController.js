@@ -54,27 +54,6 @@ const createBooks = async function (req, res) {
             return res.status(400).send({ status: false, message: 'Please provide subcategory!' })
         }
 
-        //-------------------- address validation-----------------------\\
-
-        if (Object.keys(data.address).length === 0) {
-            return res.status(400).send({ status: false, message: 'Please provide address!' })
-        }
-
-        //Street Validator
-        if (!isValidStreet(address.street)) {
-            return res.status(400).send({ status: false, message: 'Please provide Street!' })
-        }
-
-        //City Validator
-        if (!isValidCity(address.city)) {
-            return res.status(400).send({ status: false, message: 'Please provide valid City!' })
-        }
-
-        //Pincode Validator
-        if (!isValidPincode(address.pincode)) {
-            return res.status(400).send({ status: false, message: 'Please provide valid Pincode!' })
-        }
-
         let savedData = await bookModel.create(data)
         res.status(201).send({ status: true, message: 'Success', data: savedData })
 
