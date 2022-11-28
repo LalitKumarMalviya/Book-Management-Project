@@ -5,6 +5,10 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 
 const bookSchema = new mongoose.Schema({
 
+    bookCover:{
+        type: String    //.jpg formate link from cloud storage aws s3 bucket 
+    },
+
     title: {
         type: String,
         required: true,
