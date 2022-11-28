@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose")
 const bookModel = require("../model/bookModel")
 const reviewModel = require("../model/reviewModel")
 const userModel = require("../model/userModel")
-const { isValid, isValidISBN, isValidDate, isValidStreet, isValidCity, isValidPincode } = require("../validation/validation")
+const { isValid, isValidISBN, isValidDate } = require("../validation/validation")
 const moment = require('moment')
 
 
@@ -14,16 +14,30 @@ const createBooks = async function (req, res) {
     try {
 
         let data = req.body
-        let { title, excerpt, userId, ISBN, category, subcategory, address } = data
+        let { title, excerpt, userId, ISBN, category, subcategory } = data
 
         if (Object.keys(data).length === 0) {
             return res.status(400).send({ status: false, message: 'Please Enter Books data!' })
+        }
+
+        //--------------- userId validation --------------\\
+
+        if (!isValid(userId)) {
+            return res.status(400).send({ status: false, message: 'Please provide userId' })
+        }
+        userId = userId.trim()
+        if (!mongoose.isValidObjectId(userId)) {
+            return res.status(400).send({ status: false, message: 'Enter valid userId!' })
         }
 
         //-------------- Book title validation -------------\\
 
         if (!isValid(title)) {
             return res.status(400).send({ status: false, message: 'Please provide title!' })
+        }
+        let checktitle = await bookModel.findOne({ title: title, isDeleted: false })
+        if (checktitle) {
+            return res.status(400).send({ status: false, message: 'title already exsist!' })
         }
 
         //-------------- Book excerpt validation -------------\\
@@ -41,6 +55,10 @@ const createBooks = async function (req, res) {
         if (!isValidISBN(ISBN)) {
             return res.status(400).send({ status: false, message: 'Enter valid ISBN!' })
         }
+        let checkISBN = await bookModel.findOne({ ISBN: ISBN, isDeleted: false })
+        if (checkISBN) {
+            return res.status(400).send({ status: false, message: "ISBN already exists" })
+        }
 
         //------------------ category validation ------------------\\
 
@@ -53,6 +71,8 @@ const createBooks = async function (req, res) {
         if (!isValid(subcategory)) {
             return res.status(400).send({ status: false, message: 'Please provide subcategory!' })
         }
+
+
 
         let savedData = await bookModel.create(data)
         res.status(201).send({ status: true, message: 'Success', data: savedData })

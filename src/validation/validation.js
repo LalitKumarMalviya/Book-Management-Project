@@ -1,5 +1,4 @@
-let mongoose = require("mongoose")
-
+//------------------------------------{ Validations }----------------------------------------//
 
 //Value Validation
 let isValid = function (value) {

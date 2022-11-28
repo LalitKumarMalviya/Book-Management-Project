@@ -10,7 +10,8 @@ const createReviews = async function (req, res) {
     try {
 
         let data = req.body
-        let { bookId, reviewedBy, rating, review } = data
+        let { reviewedBy, rating, review } = data
+        let { bookId } = req.params
 
         if (Object.keys(data).length === 0) {
             return res.status(400).send({ status: false, message: 'Please Enter Review data!' })
@@ -58,7 +59,9 @@ const createReviews = async function (req, res) {
             }
         }
 
+        data.bookId = bookId //from params
         let savedData = await reviewModel.create(data)
+
 
         res.status(201).send({ status: true, message: 'Success', data: savedData })
 
